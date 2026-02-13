@@ -446,7 +446,7 @@
     }
     .titleRight{
       display: inline-flex;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
       margin-left: auto;
     }
@@ -1055,7 +1055,7 @@
       `;
     }
 
-    function renderTop({ title, subtitle, showSummary, backTo, showUpdatedAt = true, inlineUpdatedAt = false }) {
+    function renderTop({ title, subtitle, showSummary, backTo, showUpdatedAt = true, inlineUpdatedAt = false, inlineSubtitle = false }) {
       const top = document.getElementById("top");
       const summaryHtml = showSummary
         ? `
@@ -1089,7 +1089,7 @@
         : "";
       const subtitleHtml = subtitle ? `<span class="chip">${esc(subtitle)}</span>` : "";
       const titleRight = inlineUpdatedAt || backHtml
-        ? `<div class="titleRight">${inlineUpdatedAt ? updatedHtml : ""}${backHtml}</div>`
+        ? `<div class="titleRight">${inlineUpdatedAt ? updatedHtml : ""}${inlineUpdatedAt && inlineSubtitle ? subtitleHtml : ""}${backHtml}</div>`
         : "";
       const metaHtml = !inlineUpdatedAt && (updatedHtml || subtitleHtml)
         ? `<div class="meta">${updatedHtml}${subtitleHtml}</div>`
@@ -1156,9 +1156,12 @@
       setNavCurrent("progress");
       renderTop({
         title: `进展｜${st.label}`,
-        subtitle: "二级列表页（可点学校进入介绍）",
+        subtitle: "可点学校进入介绍",
         showSummary: true,
         backTo: "#progress",
+        showUpdatedAt: true,
+        inlineUpdatedAt: true,
+        inlineSubtitle: true,
       });
 
       const from = location.hash.replace(/^#/, "") || `progress/status/${statusKey}`;
