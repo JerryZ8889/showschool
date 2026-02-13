@@ -1,0 +1,1311 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <title>学校联系进展</title>
+  <style>
+    :root{
+      --bg: #f6f7fb;
+      --card: rgba(255,255,255,0.92);
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: rgba(15, 23, 42, 0.10);
+      --shadow: 0 14px 40px rgba(2, 6, 23, 0.08);
+      --shadow2: 0 10px 28px rgba(2, 6, 23, 0.06);
+      --ring: rgba(59,130,246,0.30);
+      --ok-bg: rgba(16,185,129,0.14);
+      --ok-fg: #047857;
+      --no-bg: rgba(239,68,68,0.13);
+      --no-fg: #b91c1c;
+      --warn-bg: rgba(245,158,11,0.16);
+      --warn-fg: #92400e;
+      --info-bg: rgba(59,130,246,0.14);
+      --info-fg: #1d4ed8;
+      --chip-bg: rgba(255,255,255,0.78);
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg: #0b1020;
+        --card: rgba(17, 24, 39, 0.78);
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --border: rgba(255,255,255,0.10);
+        --shadow: 0 16px 50px rgba(0,0,0,0.55);
+        --shadow2: 0 12px 34px rgba(0,0,0,0.45);
+        --ring: rgba(96,165,250,0.35);
+        --chip-bg: rgba(17, 24, 39, 0.72);
+        --ok-fg: #34d399;
+        --no-fg: #fb7185;
+        --warn-fg: #fbbf24;
+        --info-fg: #60a5fa;
+        --ok-bg: rgba(16,185,129,0.18);
+        --no-bg: rgba(244,63,94,0.18);
+        --warn-bg: rgba(245,158,11,0.20);
+        --info-bg: rgba(59,130,246,0.18);
+      }
+    }
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+                   Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 10% -10%, rgba(59,130,246,0.16), transparent 60%),
+        radial-gradient(900px 500px at 95% 10%, rgba(16,185,129,0.14), transparent 55%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a{ color: inherit; }
+    .wrap{
+      width: min(980px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 14px 0 calc(98px + env(safe-area-inset-bottom));
+    }
+    .top{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 12px 0 10px;
+      background: linear-gradient(to bottom, rgba(246,247,251,0.88), rgba(246,247,251,0.62), transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    @media (prefers-color-scheme: dark){
+      .top{
+        background: linear-gradient(to bottom, rgba(11,16,32,0.86), rgba(11,16,32,0.62), transparent);
+      }
+    }
+    .headerCard{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .headerMain{
+      padding: 14px 14px 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .titleRow{
+      display: grid;
+      gap: 4px;
+    }
+    h1{
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      letter-spacing: 0.2px;
+      font-weight: 820;
+    }
+    .meta{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+    .chip{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--chip-bg);
+    }
+    .summary{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (min-width: 520px){
+      .summary{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    .kpi{
+      padding: 10px 10px 9px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.42);
+    }
+    @media (prefers-color-scheme: dark){
+      .kpi{ background: rgba(0,0,0,0.18); }
+    }
+    .kpi .n{
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: 0.2px;
+      line-height: 1.05;
+    }
+    .kpi .l{
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.2px;
+    }
+    .kpi.ok .n{ color: var(--ok-fg); }
+    .kpi.no .n{ color: var(--no-fg); }
+    .kpi.warn .n{ color: var(--warn-fg); }
+    .kpi.info .n{ color: var(--info-fg); }
+    .body{
+      display: grid;
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .section{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow2);
+      overflow: hidden;
+    }
+    .sectionHead{
+      padding: 14px 14px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(to bottom, rgba(255,255,255,0.50), transparent);
+    }
+    @media (prefers-color-scheme: dark){
+      .sectionHead{ background: linear-gradient(to bottom, rgba(0,0,0,0.20), transparent); }
+    }
+    .sectionHead h2{
+      margin: 0;
+      font-size: 14px;
+      font-weight: 820;
+      letter-spacing: 0.2px;
+    }
+    .legend{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .tag{
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0.2px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.60);
+    }
+    @media (prefers-color-scheme: dark){
+      .tag{ background: rgba(0,0,0,0.18); }
+    }
+    .tag.ok{ background: var(--ok-bg); color: var(--ok-fg); border-color: rgba(16,185,129,0.20); }
+    .tag.no{ background: var(--no-bg); color: var(--no-fg); border-color: rgba(239,68,68,0.20); }
+    .tag.warn{ background: var(--warn-bg); color: var(--warn-fg); border-color: rgba(245,158,11,0.22); }
+    .tag.info{ background: var(--info-bg); color: var(--info-fg); border-color: rgba(59,130,246,0.20); }
+    .cards{
+      padding: 12px 14px 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .card{
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.70);
+      overflow: hidden;
+    }
+    @media (prefers-color-scheme: dark){
+      .card{ background: rgba(0,0,0,0.18); }
+    }
+    .cardTop{
+      padding: 12px 12px 10px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .school{
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+    .school .cn{
+      font-size: 14.5px;
+      font-weight: 860;
+      letter-spacing: 0.2px;
+      line-height: 1.18;
+    }
+    .school .en{
+      font-size: 12.5px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rows{
+      padding: 0 12px 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .row{
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 10px;
+      align-items: start;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 10px;
+      background: rgba(248,250,252,0.75);
+    }
+    @media (prefers-color-scheme: dark){
+      .row{ background: rgba(255,255,255,0.06); }
+    }
+    .row .label{
+      font-size: 12.5px;
+      font-weight: 760;
+      color: var(--muted);
+      padding-top: 2px;
+    }
+    .row .value{
+      display: grid;
+      gap: 6px;
+    }
+    .note{
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .actions{
+      padding: 12px 14px 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .action{
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.72);
+      padding: 12px 12px;
+      display: grid;
+      gap: 8px;
+    }
+    @media (prefers-color-scheme: dark){
+      .action{ background: rgba(0,0,0,0.18); }
+    }
+    .actionTop{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .when{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 850;
+      letter-spacing: 0.2px;
+      font-size: 13px;
+    }
+    .what{
+      font-size: 13.5px;
+      font-weight: 820;
+      line-height: 1.25;
+      letter-spacing: 0.2px;
+    }
+    .detail{
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .prio{
+      font-size: 12px;
+      font-weight: 760;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.55);
+      color: var(--muted);
+    }
+    @media (prefers-color-scheme: dark){
+      .prio{ background: rgba(0,0,0,0.18); }
+    }
+    .prio.high{ color: var(--no-fg); border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.10); }
+    .prio.mid{ color: var(--warn-fg); border-color: rgba(245,158,11,0.25); background: rgba(245,158,11,0.10); }
+    .prio.low{ color: var(--info-fg); border-color: rgba(59,130,246,0.25); background: rgba(59,130,246,0.10); }
+    .foot{
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      padding: 0 2px;
+    }
+    .focusable:focus{
+      outline: none;
+      box-shadow: 0 0 0 4px var(--ring);
+      border-color: rgba(59,130,246,0.40);
+    }
+    @media print{
+      body{ background: #fff; }
+      .top{ position: static; background: transparent; backdrop-filter: none; }
+      .headerCard, .section{ box-shadow: none; }
+    }
+
+    .btn{
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      padding: 0;
+      text-align: left;
+    }
+
+    .kpiBtn{
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .kpiBtn:active{
+      transform: translateY(0.5px);
+    }
+
+    .subTitle{
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+
+    .pageTitleRow{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .backBtn{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--chip-bg);
+      cursor: pointer;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1;
+    }
+
+    .backBtn:active{ transform: translateY(0.5px); }
+
+    .cardLink{
+      cursor: pointer;
+    }
+
+    .cardLink:active{
+      transform: translateY(0.5px);
+    }
+
+    .schoolTopRight{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .hero{
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(59,130,246,0.18), rgba(16,185,129,0.14));
+      padding: 14px 14px;
+    }
+    @media (prefers-color-scheme: dark){
+      .hero{
+        background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(16,185,129,0.18));
+      }
+    }
+
+    .heroInner{
+      display: grid;
+      gap: 10px;
+    }
+
+    .heroImg{
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.55);
+      overflow: hidden;
+    }
+    @media (prefers-color-scheme: dark){
+      .heroImg{ background: rgba(0,0,0,0.18); }
+    }
+
+    .heroImg svg{ display: block; width: 100%; height: auto; }
+
+    .heroMeta{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .kv{
+      display: grid;
+      gap: 10px;
+      padding: 12px 14px 14px;
+    }
+
+    .kvItem{
+      display: grid;
+      gap: 6px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 12px;
+      background: rgba(255,255,255,0.70);
+    }
+    @media (prefers-color-scheme: dark){
+      .kvItem{ background: rgba(0,0,0,0.18); }
+    }
+
+    .kvLabel{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 760;
+      letter-spacing: 0.2px;
+    }
+
+    .kvValue{
+      font-size: 13.5px;
+      font-weight: 740;
+      letter-spacing: 0.2px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .linkPill{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--chip-bg);
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 12.5px;
+      font-weight: 720;
+      line-height: 1;
+    }
+
+    .linkPill:active{ transform: translateY(0.5px); }
+
+    .bottomNav{
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 30;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: linear-gradient(to top, rgba(246,247,251,0.92), rgba(246,247,251,0.72), rgba(246,247,251,0.0));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    @media (prefers-color-scheme: dark){
+      .bottomNav{
+        background: linear-gradient(to top, rgba(11,16,32,0.88), rgba(11,16,32,0.62), rgba(11,16,32,0.0));
+      }
+    }
+
+    .bottomNavInner{
+      width: min(980px, calc(100% - 16px));
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow2);
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .navItem{
+      display: grid;
+      justify-items: center;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 8px 9px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .navIcon{
+      width: 22px;
+      height: 22px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.55);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+    }
+    @media (prefers-color-scheme: dark){
+      .navIcon{ background: rgba(0,0,0,0.18); }
+    }
+
+    .navLabel{
+      font-size: 12.5px;
+      font-weight: 780;
+      letter-spacing: 0.2px;
+      color: var(--muted);
+      line-height: 1;
+    }
+
+    .navItem[aria-current="page"]{
+      border-color: rgba(59,130,246,0.30);
+      background: rgba(59,130,246,0.10);
+    }
+    .navItem[aria-current="page"] .navLabel{
+      color: var(--text);
+    }
+    .navItem[aria-current="page"] .navIcon{
+      background: rgba(59,130,246,0.14);
+      color: var(--text);
+      border-color: rgba(59,130,246,0.30);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="top" class="top"></div>
+    <main id="app" class="body" aria-live="polite"></main>
+    <div class="foot" id="foot"></div>
+  </div>
+
+  <nav class="bottomNav" aria-label="底部导航">
+    <div class="bottomNavInner">
+      <button class="btn navItem focusable" type="button" data-nav="progress" aria-current="page">
+        <div class="navIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 18V6"></path>
+            <path d="M8 18V10"></path>
+            <path d="M12 18V4"></path>
+            <path d="M16 18V12"></path>
+            <path d="M20 18V8"></path>
+          </svg>
+        </div>
+        <div class="navLabel">进展</div>
+      </button>
+      <button class="btn navItem focusable" type="button" data-nav="plan" aria-current="false">
+        <div class="navIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 6h13"></path>
+            <path d="M8 12h13"></path>
+            <path d="M8 18h13"></path>
+            <path d="M3 6h.01"></path>
+            <path d="M3 12h.01"></path>
+            <path d="M3 18h.01"></path>
+          </svg>
+        </div>
+        <div class="navLabel">计划</div>
+      </button>
+      <button class="btn navItem focusable" type="button" data-nav="school" aria-current="false">
+        <div class="navIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18"></path>
+            <path d="M7 21V8l5-3 5 3v13"></path>
+            <path d="M9 21v-6h6v6"></path>
+          </svg>
+        </div>
+        <div class="navLabel">学校介绍</div>
+      </button>
+    </div>
+  </nav>
+
+  <script>
+    const updatedAt = "2026/02/13";
+    const updatedAtISO = "2026-02-13";
+
+    const Status = {
+      ok: { key: "ok", label: "有位置", tagClass: "ok" },
+      full: { key: "full", label: "满员", tagClass: "no" },
+      pending: { key: "pending", label: "待确认", tagClass: "warn" },
+      reply: { key: "reply", label: "待回复", tagClass: "info" },
+    };
+
+    const schools = [
+      {
+        id: "st-mary",
+        cn: "圣玛丽",
+        en: "St. Mary's International School",
+        shortEn: "ST MARY",
+        status: Status.ok,
+        statusLabel: "部分可申请",
+        availability: [
+          { label: "1年级", valueTag: { text: "没有", cls: "no" }, note: "" },
+          { label: "3年级", valueTag: { text: "有", cls: "ok" }, note: "" },
+        ],
+        intro:
+          "东京世田谷区的国际学校（英语授课）。男校，K-12，提供IB课程信息（以官网为准）。",
+        area: "东京｜世田谷区",
+        website: "https://www.smis.ac.jp/",
+        highlights: ["男校", "K-12", "IB课程（以官网为准）"],
+        hero: { a: "#3b82f6", b: "#10b981", t: "SM" },
+      },
+      {
+        id: "tis",
+        cn: "东京国际",
+        en: "Tokyo International School",
+        shortEn: "TIS",
+        status: Status.full,
+        statusLabel: "满员",
+        availability: [
+          {
+            label: "现状",
+            valueTag: { text: "待确认", cls: "warn" },
+            note: "目前是满的，暂时不确定是否会有位置空出来。",
+          },
+        ],
+        intro:
+          "东京港区的国际学校（英语授课）。IB World School（PYP/MYP/DP）信息以官网为准。",
+        area: "东京｜港区（南麻布）",
+        website: "https://tokyois.com/",
+        highlights: ["IB（PYP/MYP/DP）", "市区位置", "招生以官网为准"],
+        hero: { a: "#60a5fa", b: "#22c55e", t: "TIS" },
+      },
+      {
+        id: "shinagawa",
+        cn: "品川",
+        en: "Shinagawa International School",
+        shortEn: "SHINAGAWA",
+        status: Status.ok,
+        statusLabel: "部分可申请",
+        availability: [
+          { label: "1年级", valueTag: { text: "有", cls: "ok" }, note: "" },
+          {
+            label: "3年级",
+            valueTag: { text: "暂时没有", cls: "no" },
+            note: "确定会有一个空出来，但很有可能会优先给 waiting pool 的孩子。",
+          },
+        ],
+        intro:
+          "东京品川区域的国际学校（英语授课）。IB Continuum（PYP/MYP/DP）信息以官网为准。",
+        area: "东京｜品川区",
+        website: "https://sistokyo.jp/",
+        highlights: ["IB Continuum（以官网为准）", "多校区信息以官网为准", "招生以官网为准"],
+        hero: { a: "#3b82f6", b: "#f59e0b", t: "SIS" },
+      },
+      {
+        id: "ymca",
+        cn: "YMCA",
+        en: "Tokyo YMCA International School",
+        shortEn: "YMCA",
+        status: Status.ok,
+        statusLabel: "部分可申请",
+        availability: [
+          { label: "1年级", valueTag: { text: "有", cls: "ok" }, note: "" },
+          { label: "3年级", valueTag: { text: "暂时没", cls: "no" }, note: "" },
+        ],
+        intro:
+          "Tokyo YMCA International School（TYIS），英语授课，强调多元与社区氛围（以官网为准）。",
+        area: "东京｜江东区（东阳）",
+        website: "https://tokyo.ymca.or.jp/tyis/",
+        highlights: ["英文授课", "多元社区（以官网为准）", "招生以官网为准"],
+        hero: { a: "#10b981", b: "#06b6d4", t: "Y" },
+      },
+      {
+        id: "aoba",
+        cn: "青叶",
+        en: "Aoba-Japan International School",
+        shortEn: "AOBA",
+        status: Status.ok,
+        statusLabel: "可申请",
+        availability: [
+          { label: "1年级", valueTag: { text: "有", cls: "ok" }, note: "" },
+          { label: "3年级", valueTag: { text: "有", cls: "ok" }, note: "" },
+        ],
+        intro:
+          "Aoba-Japan International School，东京的国际学校（英语授课）。IB Continuum World School 信息以官网为准。",
+        area: "东京｜多校区（以官网为准）",
+        website: "https://japaninternationalschool.com/",
+        highlights: ["IB Continuum（以官网为准）", "多校区（以官网为准）", "招生以官网为准"],
+        hero: { a: "#22c55e", b: "#3b82f6", t: "A" },
+      },
+      {
+        id: "yoyogi",
+        cn: "代代木",
+        en: "Yoyogi International School",
+        shortEn: "YOYOGI",
+        status: Status.pending,
+        statusLabel: "待确认",
+        availability: [
+          {
+            label: "现状",
+            valueTag: { text: "待确认", cls: "warn" },
+            note: "假期，暂时不知道学位情况。",
+          },
+        ],
+        intro:
+          "位于东京涩谷区域的国际学校（英语授课）。IB（PYP授权）与课程框架信息以官网为准。",
+        area: "东京｜涩谷区（代代木/宇田川町）",
+        website: "https://yoyogi-is.com/",
+        highlights: ["IB PYP（以官网为准）", "小班制（以官网为准）", "招生以官网为准"],
+        hero: { a: "#f59e0b", b: "#3b82f6", t: "YI" },
+      },
+      {
+        id: "malvern",
+        cn: "马文",
+        en: "Malvern College Tokyo",
+        shortEn: "MALVERN",
+        status: Status.reply,
+        statusLabel: "待回复",
+        availability: [
+          {
+            label: "现状",
+            valueTag: { text: "待回复", cls: "info" },
+            note: "已发邮件，等回复。",
+          },
+        ],
+        intro:
+          "Malvern 体系东京校。IB World School（PYP/MYP/DP）与校区信息以官网为准。",
+        area: "东京周边｜小平市（以官网为准）",
+        website: "https://www.malverncollegetokyo.jp/",
+        highlights: ["IB（PYP/MYP/DP）", "英式传统（以官网为准）", "招生以官网为准"],
+        hero: { a: "#60a5fa", b: "#f97316", t: "M" },
+      },
+    ];
+
+    const plans = [
+      {
+        when: "2/16",
+        prio: "high",
+        prioText: "优先级：高",
+        badge: { text: "询问", cls: "warn" },
+        what: "联系代代木（YOYOGI）：电话或邮件询问学位情况",
+        detail: "确认：可申请年级、是否有名额、预计空出时间、需要的材料与截止时间。",
+        schools: ["yoyogi"],
+      },
+      {
+        when: "尽快",
+        prio: "high",
+        prioText: "优先级：高",
+        badge: { text: "跟进", cls: "info" },
+        what: "跟进 MALVERN（马文）：确认是否有位置",
+        detail: "目标：拿到明确回复；如有位置，推进申请流程与预约沟通。",
+        schools: ["malvern"],
+      },
+      {
+        when: "2/21",
+        prio: "mid",
+        prioText: "优先级：中",
+        badge: { text: "参与", cls: "ok" },
+        what: "参加 AOBA（青叶）线上说明会",
+        detail: "备注：无法参观学校，可通过线上说明会补足关键信息与提问。",
+        schools: ["aoba"],
+      },
+      {
+        when: "持续",
+        prio: "mid",
+        prioText: "优先级：中",
+        badge: { text: "拓展", cls: "warn" },
+        what: "继续寻找更多学校",
+        detail: "补充备选项，降低满员/等待池带来的不确定性。",
+        schools: [],
+      },
+    ];
+
+    function esc(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function findSchool(id) {
+      return schools.find((s) => s.id === id) || null;
+    }
+
+    function statusCount(key) {
+      return schools.filter((s) => s.status.key === key).length;
+    }
+
+    function setNavCurrent(key) {
+      document.querySelectorAll("[data-nav]").forEach((el) => {
+        el.setAttribute("aria-current", el.getAttribute("data-nav") === key ? "page" : "false");
+      });
+    }
+
+    function svgCardHero({ a, b, t, title, uid }) {
+      const label = (t || "").slice(0, 3);
+      const safeTitle = esc(title || "");
+      const safeLabel = esc(label);
+      const safeUid = esc(String(uid || "x").replace(/[^a-zA-Z0-9_-]/g, "_"));
+      const gid = `g_${safeUid}`;
+      const sid = `s_${safeUid}`;
+      return `
+        <svg viewBox="0 0 1200 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${safeTitle}">
+          <defs>
+            <linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="${esc(a)}" stop-opacity="0.92"/>
+              <stop offset="100%" stop-color="${esc(b)}" stop-opacity="0.92"/>
+            </linearGradient>
+            <filter id="${sid}" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="rgba(2,6,23,0.25)"/>
+            </filter>
+          </defs>
+          <rect width="1200" height="520" fill="url(#${gid})"/>
+          <circle cx="180" cy="120" r="160" fill="rgba(255,255,255,0.16)"/>
+          <circle cx="1020" cy="420" r="210" fill="rgba(255,255,255,0.12)"/>
+          <g filter="url(#${sid})">
+            <rect x="90" y="120" width="1020" height="310" rx="28" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.22)"/>
+          </g>
+          <text x="140" y="260" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="98" font-weight="860" fill="rgba(255,255,255,0.92)">${safeLabel}</text>
+          <text x="140" y="330" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="42" font-weight="700" fill="rgba(255,255,255,0.86)">${safeTitle}</text>
+          <text x="140" y="390" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="28" font-weight="650" fill="rgba(255,255,255,0.76)">School Profile</text>
+        </svg>
+      `;
+    }
+
+    function linkToSchoolDetail(schoolId, from) {
+      const cleanFrom = String(from || "school").replace(/^#/, "");
+      return `#school/${esc(schoolId)}?from=${encodeURIComponent(cleanFrom)}`;
+    }
+
+    function schoolCard(s, from) {
+      const rows = s.availability
+        .map((r) => {
+          const note = r.note ? `<div class="note">${esc(r.note)}</div>` : "";
+          return `
+            <div class="row">
+              <div class="label">${esc(r.label)}</div>
+              <div class="value">
+                <div><span class="tag ${esc(r.valueTag.cls)}">${esc(r.valueTag.text)}</span></div>
+                ${note}
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      return `
+        <article class="card cardLink focusable" tabindex="0" role="link" data-link="${linkToSchoolDetail(s.id, from)}" aria-label="查看学校介绍：${esc(s.cn)}">
+          <div class="cardTop">
+            <div class="school">
+              <div class="cn">${esc(s.cn)}（${esc(s.shortEn)}）</div>
+              <div class="en">${esc(s.en)}</div>
+            </div>
+            <div class="schoolTopRight">
+              <span class="tag ${esc(s.status.tagClass)}">${esc(s.statusLabel)}</span>
+            </div>
+          </div>
+          <div class="rows">
+            ${rows}
+          </div>
+        </article>
+      `;
+    }
+
+    function compactSchoolCard(s) {
+      const pills = (s.highlights || [])
+        .slice(0, 3)
+        .map((h) => `<span class="tag">${esc(h)}</span>`)
+        .join("");
+
+      return `
+        <article class="card cardLink focusable" tabindex="0" role="link" data-link="#school/${esc(s.id)}" aria-label="查看学校介绍：${esc(s.cn)}">
+          <div class="cardTop">
+            <div class="school">
+              <div class="cn">${esc(s.cn)}（${esc(s.shortEn)}）</div>
+              <div class="en">${esc(s.en)}</div>
+            </div>
+            <div class="schoolTopRight">
+              <span class="tag ${esc(s.status.tagClass)}">${esc(s.status.label)}</span>
+            </div>
+          </div>
+          <div class="rows">
+            <div class="row">
+              <div class="label">简介</div>
+              <div class="value">
+                <div class="note">${esc(s.intro)}</div>
+                <div class="legend" style="margin-top:6px;">${pills}</div>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function schoolDetailSection(s) {
+      const tags = (s.highlights || []).map((h) => `<span class="tag">${esc(h)}</span>`).join("");
+      const heroSvg = svgCardHero({ ...s.hero, title: `${s.cn} ${s.shortEn}`, uid: `list_${s.id}` });
+
+      return `
+        <section class="section" aria-label="学校介绍详情：${esc(s.cn)}">
+          <div class="hero">
+            <div class="heroInner">
+              <div class="heroImg">${heroSvg}</div>
+              <div class="heroMeta">
+                <span class="tag ${esc(s.status.tagClass)}">${esc(s.status.label)}</span>
+                ${tags}
+              </div>
+            </div>
+          </div>
+
+          <div class="kv">
+            <div class="kvItem">
+              <div class="kvLabel">学校名称</div>
+              <div class="kvValue">${esc(s.cn)}（${esc(s.en)}）</div>
+            </div>
+            <div class="kvItem">
+              <div class="kvLabel">区域</div>
+              <div class="kvValue">${esc(s.area || "以官网为准")}</div>
+            </div>
+            <div class="kvItem">
+              <div class="kvLabel">简介</div>
+              <div class="kvValue">${esc(s.intro)}</div>
+            </div>
+            <div class="kvItem">
+              <div class="kvLabel">官网</div>
+              <div class="kvValue">
+                <a class="linkPill focusable" href="${esc(s.website)}" target="_blank" rel="noreferrer">打开官网</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderTop({ title, subtitle, showSummary, backTo }) {
+      const top = document.getElementById("top");
+      const summaryHtml = showSummary
+        ? `
+          <div class="summary" aria-label="按状态筛选">
+            <button class="btn kpi kpiBtn ok focusable" type="button" data-link="#progress/status/ok" aria-label="查看有位置学校">
+              <div class="n">${statusCount("ok")}</div>
+              <div class="l">${esc(Status.ok.label)}</div>
+            </button>
+            <button class="btn kpi kpiBtn no focusable" type="button" data-link="#progress/status/full" aria-label="查看满员学校">
+              <div class="n">${statusCount("full")}</div>
+              <div class="l">${esc(Status.full.label)}</div>
+            </button>
+            <button class="btn kpi kpiBtn warn focusable" type="button" data-link="#progress/status/pending" aria-label="查看待确认学校">
+              <div class="n">${statusCount("pending")}</div>
+              <div class="l">${esc(Status.pending.label)}</div>
+            </button>
+            <button class="btn kpi kpiBtn info focusable" type="button" data-link="#progress/status/reply" aria-label="查看待回复学校">
+              <div class="n">${statusCount("reply")}</div>
+              <div class="l">${esc(Status.reply.label)}</div>
+            </button>
+          </div>
+        `
+        : "";
+
+      const backHtml = backTo
+        ? `<button class="btn backBtn focusable" type="button" data-link="${esc(backTo)}" aria-label="返回">← 返回</button>`
+        : "";
+
+      top.innerHTML = `
+        <div class="headerCard">
+          <div class="headerMain">
+            <div class="titleRow">
+              <div class="pageTitleRow">
+                <h1>${esc(title)}</h1>
+                ${backHtml}
+              </div>
+              <div class="meta">
+                <span class="chip">更新：<time datetime="${esc(updatedAtISO)}">${esc(updatedAt)}</time></span>
+                <span class="chip">${esc(subtitle)}</span>
+              </div>
+              ${summaryHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProgressHome() {
+      setNavCurrent("progress");
+      renderTop({
+        title: "学校联系进展",
+        subtitle: "点击状态可进入列表页",
+        showSummary: true,
+        backTo: null,
+      });
+
+      const from = location.hash.replace(/^#/, "") || "progress";
+      const app = document.getElementById("app");
+      app.innerHTML = `
+        <section class="section" aria-label="学位情况">
+          <div class="sectionHead">
+            <h2>学位情况</h2>
+            <div class="legend" aria-label="状态说明">
+              <span class="tag ok">${esc(Status.ok.label)}</span>
+              <span class="tag no">${esc(Status.full.label)}</span>
+              <span class="tag warn">${esc(Status.pending.label)}</span>
+              <span class="tag info">${esc(Status.reply.label)}</span>
+            </div>
+          </div>
+          <div class="cards">
+            ${schools.map((s) => schoolCard(s, from)).join("")}
+          </div>
+        </section>
+      `;
+
+      document.getElementById("foot").textContent =
+        "提示：底部可切换「进展 / 计划 / 学校介绍」。学校卡片可点进介绍页。";
+    }
+
+    function renderProgressFiltered(statusKey) {
+      const st = Status[statusKey] || null;
+      if (!st) {
+        navigate("#progress");
+        return;
+      }
+      setNavCurrent("progress");
+      renderTop({
+        title: `进展｜${st.label}`,
+        subtitle: "二级列表页（可点学校进入介绍）",
+        showSummary: true,
+        backTo: "#progress",
+      });
+
+      const from = location.hash.replace(/^#/, "") || `progress/status/${statusKey}`;
+      const app = document.getElementById("app");
+      const list = schools.filter((s) => s.status.key === statusKey);
+      app.innerHTML = `
+        <section class="section" aria-label="筛选结果">
+          <div class="sectionHead">
+            <h2>符合条件的学校（${list.length}）</h2>
+            <div class="legend">
+              <span class="tag ${esc(st.tagClass)}">${esc(st.label)}</span>
+            </div>
+          </div>
+          <div class="cards">
+            ${list.map((s) => schoolCard(s, from)).join("")}
+          </div>
+        </section>
+      `;
+
+      document.getElementById("foot").textContent =
+        "提示：点击顶部四个状态可快速切换列表；点击学校进入「学校介绍」。";
+    }
+
+    function renderPlan() {
+      setNavCurrent("plan");
+      renderTop({
+        title: "行动计划",
+        subtitle: "计划中的学校也可点进介绍",
+        showSummary: false,
+        backTo: null,
+      });
+
+      const from = location.hash.replace(/^#/, "") || "plan";
+      const app = document.getElementById("app");
+      const actionsHtml = plans
+        .map((p) => {
+          const schoolPills =
+            p.schools && p.schools.length
+              ? `
+                <div class="legend">
+                  ${p.schools
+                    .map((id) => {
+                      const s = findSchool(id);
+                      if (!s) return "";
+                      return `<button class="btn linkPill focusable" type="button" data-link="${linkToSchoolDetail(s.id, from)}">${esc(s.cn)}（${esc(s.shortEn)}）</button>`;
+                    })
+                    .join("")}
+                </div>
+              `
+              : "";
+
+          return `
+            <div class="action">
+              <div class="actionTop">
+                <div class="when">${esc(p.when)} <span class="tag ${esc(p.badge.cls)}">${esc(p.badge.text)}</span></div>
+                <div class="prio ${esc(p.prio)}">${esc(p.prioText)}</div>
+              </div>
+              <div class="what">${esc(p.what)}</div>
+              <div class="detail">${esc(p.detail)}</div>
+              ${schoolPills}
+            </div>
+          `;
+        })
+        .join("");
+
+      app.innerHTML = `
+        <section class="section" aria-label="后续行动计划">
+          <div class="sectionHead">
+            <h2>后续行动计划</h2>
+            <div class="legend">
+              <span class="chip">可点学校名称进入介绍页</span>
+            </div>
+          </div>
+          <div class="actions">
+            ${actionsHtml}
+          </div>
+        </section>
+      `;
+
+      document.getElementById("foot").textContent =
+        "提示：从「计划」也可以进入学校介绍页，方便客户了解学校背景。";
+    }
+
+    function renderSchoolList() {
+      setNavCurrent("school");
+      renderTop({
+        title: "学校介绍",
+        subtitle: "所有学校详情（从上到下）",
+        showSummary: false,
+        backTo: null,
+      });
+
+      const app = document.getElementById("app");
+      app.innerHTML = schools.map(schoolDetailSection).join("");
+
+      document.getElementById("foot").textContent = "";
+    }
+
+    function renderSchoolDetail(id, from) {
+      const s = findSchool(id);
+      if (!s) {
+        navigate("#school");
+        return;
+      }
+      setNavCurrent("school");
+      const backTo = from ? `#${String(from).replace(/^#/, "")}` : "#school";
+      renderTop({
+        title: `学校介绍｜${s.cn}`,
+        subtitle: "可返回列表或继续切换底部导航",
+        showSummary: false,
+        backTo,
+      });
+
+      const app = document.getElementById("app");
+      const tags = (s.highlights || []).map((h) => `<span class="tag">${esc(h)}</span>`).join("");
+      const heroSvg = svgCardHero({ ...s.hero, title: `${s.cn} ${s.shortEn}`, uid: `detail_${s.id}` });
+
+      app.innerHTML = `
+        <section class="section" aria-label="学校介绍详情">
+          <div class="hero">
+            <div class="heroInner">
+              <div class="heroImg">${heroSvg}</div>
+              <div class="heroMeta">
+                <span class="tag ${esc(s.status.tagClass)}">${esc(s.status.label)}</span>
+                ${tags}
+              </div>
+            </div>
+          </div>
+
+          <div class="kv">
+            <div class="kvItem">
+              <div class="kvLabel">学校名称</div>
+              <div class="kvValue">${esc(s.cn)}（${esc(s.en)}）</div>
+            </div>
+            <div class="kvItem">
+              <div class="kvLabel">区域</div>
+              <div class="kvValue">${esc(s.area || "以官网为准")}</div>
+            </div>
+            <div class="kvItem">
+              <div class="kvLabel">简介</div>
+              <div class="kvValue">${esc(s.intro)}</div>
+            </div>
+            <div class="kvItem">
+              <div class="kvLabel">官网</div>
+              <div class="kvValue">
+                <a class="linkPill focusable" href="${esc(s.website)}" target="_blank" rel="noreferrer">打开官网</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+
+      document.getElementById("foot").textContent =
+        "";
+    }
+
+    function parseRoute(hash) {
+      const h = (hash || "#progress").replace(/^#/, "");
+      const [pathPart, queryPart] = h.split("?");
+      const parts = String(pathPart || "").split("/").filter(Boolean);
+      const params = new URLSearchParams(queryPart || "");
+      const page = parts[0] || "progress";
+      if (page === "progress" && parts[1] === "status" && parts[2]) {
+        return { page: "progressStatus", status: parts[2] };
+      }
+      if (page === "plan") return { page: "plan" };
+      if (page === "school" && parts[1]) return { page: "schoolDetail", id: parts[1], from: params.get("from") || "" };
+      if (page === "school") return { page: "school" };
+      return { page: "progress" };
+    }
+
+    function navigate(hash) {
+      if (!hash.startsWith("#")) hash = "#" + hash;
+      if (location.hash === hash) {
+        render();
+        return;
+      }
+      location.hash = hash;
+    }
+
+    function render() {
+      const route = parseRoute(location.hash);
+      if (route.page === "progress") renderProgressHome();
+      else if (route.page === "progressStatus") renderProgressFiltered(route.status);
+      else if (route.page === "plan") renderPlan();
+      else if (route.page === "school") renderSchoolList();
+      else if (route.page === "schoolDetail") renderSchoolDetail(route.id, route.from);
+      else renderProgressHome();
+    }
+
+    function onActivateLink(el) {
+      const to = el.getAttribute("data-link");
+      if (to) navigate(to);
+    }
+
+    document.addEventListener("click", (e) => {
+      const linkEl = e.target.closest("[data-link]");
+      if (linkEl) {
+        e.preventDefault();
+        onActivateLink(linkEl);
+        return;
+      }
+      const navEl = e.target.closest("[data-nav]");
+      if (navEl) {
+        e.preventDefault();
+        const key = navEl.getAttribute("data-nav");
+        if (key === "progress") navigate("#progress");
+        else if (key === "plan") navigate("#plan");
+        else if (key === "school") navigate("#school");
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      const linkEl = e.target.closest('[role="link"][data-link], button[data-link]');
+      if (linkEl) {
+        e.preventDefault();
+        onActivateLink(linkEl);
+      }
+    });
+
+    window.addEventListener("hashchange", render);
+
+    if (!location.hash) location.hash = "#progress";
+    render();
+  </script>
+</body>
+</html>
