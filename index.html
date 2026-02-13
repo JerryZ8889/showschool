@@ -1110,27 +1110,9 @@
       `;
     }
 
-    function renderProgressStatusTop(statusKey) {
+    function renderTop({ title, subtitle, showSummary, backTo, showUpdatedAt = true, inlineUpdatedAt = false, inlineSubtitle = false, summaryActiveKey = "" }) {
       const top = document.getElementById("top");
-      const backHtml = `<button class="btn backBtn focusable" type="button" data-link="#progress" aria-label="返回">← 返回</button>`;
-      const leftHtml = `<div class="metaLeft"><span class="chip">进展</span></div>`;
-      const rightHtml = `<div class="titleRight"><span class="chip">可点击学校进入介绍</span>${backHtml}</div>`;
-
-      top.innerHTML = `
-        <div class="headerCard">
-          <div class="headerMain">
-            <div class="titleRow">
-              <div class="meta metaSplit">${leftHtml}<div class="metaRight">${rightHtml}</div></div>
-              ${getSummaryHtml(statusKey)}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderTop({ title, subtitle, showSummary, backTo, showUpdatedAt = true, inlineUpdatedAt = false, inlineSubtitle = false }) {
-      const top = document.getElementById("top");
-      const summaryHtml = showSummary ? getSummaryHtml("") : "";
+      const summaryHtml = showSummary ? getSummaryHtml(summaryActiveKey) : "";
 
       const backHtml = backTo
         ? `<button class="btn backBtn focusable" type="button" data-link="${esc(backTo)}" aria-label="返回">← 返回</button>`
@@ -1182,11 +1164,8 @@
         <section class="section" aria-label="学位情况">
           <div class="sectionHead">
             <h2>学位情况</h2>
-            <div class="legend" aria-label="状态说明">
-              <span class="tag ok">${esc(Status.ok.label)}</span>
-              <span class="tag no">${esc(Status.full.label)}</span>
-              <span class="tag warn">${esc(Status.pending.label)}</span>
-              <span class="tag info">${esc(Status.reply.label)}</span>
+            <div class="legend">
+              <span class="chip">可点击学校名称进入介绍</span>
             </div>
           </div>
           <div class="cards">
@@ -1206,7 +1185,14 @@
         return;
       }
       setNavCurrent("progress");
-      renderProgressStatusTop(statusKey);
+      renderTop({
+        title: "学校联系进展",
+        subtitle: "",
+        showSummary: true,
+        backTo: "#progress",
+        showUpdatedAt: false,
+        summaryActiveKey: statusKey,
+      });
 
       const from = location.hash.replace(/^#/, "") || `progress/status/${statusKey}`;
       const app = document.getElementById("app");
