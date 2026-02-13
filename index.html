@@ -429,6 +429,16 @@
       transform: translateY(0.5px);
       box-shadow: 0 10px 22px rgba(2, 6, 23, 0.10);
     }
+    .kpiBtn[aria-current="true"]{
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 4px var(--ring), 0 18px 34px rgba(2, 6, 23, 0.12);
+      border-color: rgba(59,130,246,0.34);
+    }
+    @media (prefers-color-scheme: dark){
+      .kpiBtn[aria-current="true"]{
+        box-shadow: 0 0 0 4px var(--ring), 0 18px 38px rgba(0,0,0,0.52);
+      }
+    }
 
     .subTitle{
       margin-top: 2px;
@@ -1072,22 +1082,22 @@
       `;
     }
 
-    function getSummaryHtml() {
+    function getSummaryHtml(activeKey) {
       return `
         <div class="summary" aria-label="按状态筛选">
-          <button class="btn kpi kpiBtn ok focusable" type="button" data-link="#progress/status/ok" aria-label="查看有位置学校">
+          <button class="btn kpi kpiBtn ok focusable" type="button" data-link="#progress/status/ok" aria-label="查看有位置学校" aria-current="${activeKey === "ok" ? "true" : "false"}">
             <div class="n">${statusCount("ok")}</div>
             <div class="l">${esc(Status.ok.label)}</div>
           </button>
-          <button class="btn kpi kpiBtn no focusable" type="button" data-link="#progress/status/full" aria-label="查看满员学校">
+          <button class="btn kpi kpiBtn no focusable" type="button" data-link="#progress/status/full" aria-label="查看满员学校" aria-current="${activeKey === "full" ? "true" : "false"}">
             <div class="n">${statusCount("full")}</div>
             <div class="l">${esc(Status.full.label)}</div>
           </button>
-          <button class="btn kpi kpiBtn warn focusable" type="button" data-link="#progress/status/pending" aria-label="查看待确认学校">
+          <button class="btn kpi kpiBtn warn focusable" type="button" data-link="#progress/status/pending" aria-label="查看待确认学校" aria-current="${activeKey === "pending" ? "true" : "false"}">
             <div class="n">${statusCount("pending")}</div>
             <div class="l">${esc(Status.pending.label)}</div>
           </button>
-          <button class="btn kpi kpiBtn info focusable" type="button" data-link="#progress/status/reply" aria-label="查看待回复学校">
+          <button class="btn kpi kpiBtn info focusable" type="button" data-link="#progress/status/reply" aria-label="查看待回复学校" aria-current="${activeKey === "reply" ? "true" : "false"}">
             <div class="n">${statusCount("reply")}</div>
             <div class="l">${esc(Status.reply.label)}</div>
           </button>
@@ -1095,20 +1105,18 @@
       `;
     }
 
-    function renderProgressStatusTop() {
+    function renderProgressStatusTop(statusKey) {
       const top = document.getElementById("top");
       const backHtml = `<button class="btn backBtn focusable" type="button" data-link="#progress" aria-label="返回">← 返回</button>`;
-      const updatedHtml = `<span class="chip">更新：<time datetime="${esc(updatedAtISO)}">${esc(updatedAt)}</time></span>`;
-      const leftHtml = `<div class="metaLeft"><span class="chip">进展</span>${updatedHtml}</div>`;
-      const rightHtml = `<span class="chip">可点击学校进入介绍</span>`;
+      const leftHtml = `<div class="metaLeft"><span class="chip">进展</span></div>`;
+      const rightHtml = `<div class="titleRight"><span class="chip">可点击学校进入介绍</span>${backHtml}</div>`;
 
       top.innerHTML = `
         <div class="headerCard">
           <div class="headerMain">
             <div class="titleRow">
-              <div class="topBackRow">${backHtml}</div>
               <div class="meta metaSplit">${leftHtml}<div class="metaRight">${rightHtml}</div></div>
-              ${getSummaryHtml()}
+              ${getSummaryHtml(statusKey)}
             </div>
           </div>
         </div>
@@ -1117,7 +1125,7 @@
 
     function renderTop({ title, subtitle, showSummary, backTo, showUpdatedAt = true, inlineUpdatedAt = false, inlineSubtitle = false }) {
       const top = document.getElementById("top");
-      const summaryHtml = showSummary ? getSummaryHtml() : "";
+      const summaryHtml = showSummary ? getSummaryHtml("") : "";
 
       const backHtml = backTo
         ? `<button class="btn backBtn focusable" type="button" data-link="${esc(backTo)}" aria-label="返回">← 返回</button>`
@@ -1193,7 +1201,7 @@
         return;
       }
       setNavCurrent("progress");
-      renderProgressStatusTop();
+      renderProgressStatusTop(statusKey);
 
       const from = location.hash.replace(/^#/, "") || `progress/status/${statusKey}`;
       const app = document.getElementById("app");
