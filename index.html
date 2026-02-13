@@ -378,15 +378,39 @@
     .kpiBtn{
       width: 100%;
       cursor: pointer;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.72), rgba(255,255,255,0.38));
-      box-shadow: 0 12px 26px rgba(2, 6, 23, 0.08);
+      background: linear-gradient(to bottom, rgba(255,255,255,0.82), rgba(255,255,255,0.46));
+      box-shadow: 0 12px 26px rgba(2, 6, 23, 0.10);
       transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+    .kpiBtn.ok{
+      border-color: rgba(16,185,129,0.26);
+      background:
+        linear-gradient(to bottom, rgba(16,185,129,0.16), rgba(255,255,255,0.56));
+    }
+    .kpiBtn.no{
+      border-color: rgba(239,68,68,0.26);
+      background:
+        linear-gradient(to bottom, rgba(239,68,68,0.14), rgba(255,255,255,0.56));
+    }
+    .kpiBtn.warn{
+      border-color: rgba(245,158,11,0.30);
+      background:
+        linear-gradient(to bottom, rgba(245,158,11,0.16), rgba(255,255,255,0.56));
+    }
+    .kpiBtn.info{
+      border-color: rgba(59,130,246,0.28);
+      background:
+        linear-gradient(to bottom, rgba(59,130,246,0.16), rgba(255,255,255,0.56));
     }
     @media (prefers-color-scheme: dark){
       .kpiBtn{
-        background: linear-gradient(to bottom, rgba(0,0,0,0.20), rgba(0,0,0,0.10));
+        background: linear-gradient(to bottom, rgba(0,0,0,0.22), rgba(0,0,0,0.12));
         box-shadow: 0 14px 30px rgba(0,0,0,0.40);
       }
+      .kpiBtn.ok{ border-color: rgba(16,185,129,0.28); background: linear-gradient(to bottom, rgba(16,185,129,0.18), rgba(0,0,0,0.12)); }
+      .kpiBtn.no{ border-color: rgba(244,63,94,0.28); background: linear-gradient(to bottom, rgba(244,63,94,0.16), rgba(0,0,0,0.12)); }
+      .kpiBtn.warn{ border-color: rgba(245,158,11,0.30); background: linear-gradient(to bottom, rgba(245,158,11,0.18), rgba(0,0,0,0.12)); }
+      .kpiBtn.info{ border-color: rgba(96,165,250,0.28); background: linear-gradient(to bottom, rgba(96,165,250,0.18), rgba(0,0,0,0.12)); }
     }
     @media (hover:hover){
       .kpiBtn:hover{
@@ -419,6 +443,12 @@
       justify-content: space-between;
       gap: 10px;
       flex-wrap: wrap;
+    }
+    .titleRight{
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      margin-left: auto;
     }
 
     .backBtn{
@@ -1025,7 +1055,7 @@
       `;
     }
 
-    function renderTop({ title, subtitle, showSummary, backTo }) {
+    function renderTop({ title, subtitle, showSummary, backTo, showUpdatedAt = true, inlineUpdatedAt = false }) {
       const top = document.getElementById("top");
       const summaryHtml = showSummary
         ? `
@@ -1054,18 +1084,28 @@
         ? `<button class="btn backBtn focusable" type="button" data-link="${esc(backTo)}" aria-label="返回">← 返回</button>`
         : "";
 
+      const updatedHtml = showUpdatedAt
+        ? `<span class="chip">更新：<time datetime="${esc(updatedAtISO)}">${esc(updatedAt)}</time></span>`
+        : "";
+      const subtitleHtml = subtitle ? `<span class="chip">${esc(subtitle)}</span>` : "";
+      const titleRight = inlineUpdatedAt || backHtml
+        ? `<div class="titleRight">${inlineUpdatedAt ? updatedHtml : ""}${backHtml}</div>`
+        : "";
+      const metaHtml = !inlineUpdatedAt && (updatedHtml || subtitleHtml)
+        ? `<div class="meta">${updatedHtml}${subtitleHtml}</div>`
+        : subtitleHtml
+          ? `<div class="meta">${subtitleHtml}</div>`
+          : "";
+
       top.innerHTML = `
         <div class="headerCard">
           <div class="headerMain">
             <div class="titleRow">
               <div class="pageTitleRow">
                 <h1>${esc(title)}</h1>
-                ${backHtml}
+                ${titleRight}
               </div>
-              <div class="meta">
-                <span class="chip">更新：<time datetime="${esc(updatedAtISO)}">${esc(updatedAt)}</time></span>
-                <span class="chip">${esc(subtitle)}</span>
-              </div>
+              ${metaHtml}
               ${summaryHtml}
             </div>
           </div>
@@ -1077,9 +1117,11 @@
       setNavCurrent("progress");
       renderTop({
         title: "学校联系进展",
-        subtitle: "点击状态可进入列表页",
+        subtitle: "",
         showSummary: true,
         backTo: null,
+        showUpdatedAt: true,
+        inlineUpdatedAt: true,
       });
 
       const from = location.hash.replace(/^#/, "") || "progress";
@@ -1144,9 +1186,10 @@
       setNavCurrent("plan");
       renderTop({
         title: "行动计划",
-        subtitle: "计划中的学校也可点进介绍",
+        subtitle: "",
         showSummary: false,
         backTo: null,
+        showUpdatedAt: false,
       });
 
       const from = location.hash.replace(/^#/, "") || "plan";
@@ -1204,9 +1247,10 @@
       setNavCurrent("school");
       renderTop({
         title: "学校介绍",
-        subtitle: "所有学校详情（从上到下）",
+        subtitle: "",
         showSummary: false,
         backTo: null,
+        showUpdatedAt: false,
       });
 
       const app = document.getElementById("app");
@@ -1228,6 +1272,7 @@
         subtitle: "可返回列表或继续切换底部导航",
         showSummary: false,
         backTo,
+        showUpdatedAt: false,
       });
 
       const app = document.getElementById("app");
