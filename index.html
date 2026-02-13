@@ -450,6 +450,23 @@
       align-items: center;
       margin-left: auto;
     }
+    .topBackRow{
+      display: flex;
+      align-items: center;
+    }
+    .metaSplit{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .metaLeft{
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
     .backBtn{
       display: inline-flex;
@@ -1055,30 +1072,52 @@
       `;
     }
 
+    function getSummaryHtml() {
+      return `
+        <div class="summary" aria-label="按状态筛选">
+          <button class="btn kpi kpiBtn ok focusable" type="button" data-link="#progress/status/ok" aria-label="查看有位置学校">
+            <div class="n">${statusCount("ok")}</div>
+            <div class="l">${esc(Status.ok.label)}</div>
+          </button>
+          <button class="btn kpi kpiBtn no focusable" type="button" data-link="#progress/status/full" aria-label="查看满员学校">
+            <div class="n">${statusCount("full")}</div>
+            <div class="l">${esc(Status.full.label)}</div>
+          </button>
+          <button class="btn kpi kpiBtn warn focusable" type="button" data-link="#progress/status/pending" aria-label="查看待确认学校">
+            <div class="n">${statusCount("pending")}</div>
+            <div class="l">${esc(Status.pending.label)}</div>
+          </button>
+          <button class="btn kpi kpiBtn info focusable" type="button" data-link="#progress/status/reply" aria-label="查看待回复学校">
+            <div class="n">${statusCount("reply")}</div>
+            <div class="l">${esc(Status.reply.label)}</div>
+          </button>
+        </div>
+      `;
+    }
+
+    function renderProgressStatusTop() {
+      const top = document.getElementById("top");
+      const backHtml = `<button class="btn backBtn focusable" type="button" data-link="#progress" aria-label="返回">← 返回</button>`;
+      const updatedHtml = `<span class="chip">更新：<time datetime="${esc(updatedAtISO)}">${esc(updatedAt)}</time></span>`;
+      const leftHtml = `<div class="metaLeft"><span class="chip">进展</span>${updatedHtml}</div>`;
+      const rightHtml = `<span class="chip">可点击学校进入介绍</span>`;
+
+      top.innerHTML = `
+        <div class="headerCard">
+          <div class="headerMain">
+            <div class="titleRow">
+              <div class="topBackRow">${backHtml}</div>
+              <div class="meta metaSplit">${leftHtml}<div class="metaRight">${rightHtml}</div></div>
+              ${getSummaryHtml()}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderTop({ title, subtitle, showSummary, backTo, showUpdatedAt = true, inlineUpdatedAt = false, inlineSubtitle = false }) {
       const top = document.getElementById("top");
-      const summaryHtml = showSummary
-        ? `
-          <div class="summary" aria-label="按状态筛选">
-            <button class="btn kpi kpiBtn ok focusable" type="button" data-link="#progress/status/ok" aria-label="查看有位置学校">
-              <div class="n">${statusCount("ok")}</div>
-              <div class="l">${esc(Status.ok.label)}</div>
-            </button>
-            <button class="btn kpi kpiBtn no focusable" type="button" data-link="#progress/status/full" aria-label="查看满员学校">
-              <div class="n">${statusCount("full")}</div>
-              <div class="l">${esc(Status.full.label)}</div>
-            </button>
-            <button class="btn kpi kpiBtn warn focusable" type="button" data-link="#progress/status/pending" aria-label="查看待确认学校">
-              <div class="n">${statusCount("pending")}</div>
-              <div class="l">${esc(Status.pending.label)}</div>
-            </button>
-            <button class="btn kpi kpiBtn info focusable" type="button" data-link="#progress/status/reply" aria-label="查看待回复学校">
-              <div class="n">${statusCount("reply")}</div>
-              <div class="l">${esc(Status.reply.label)}</div>
-            </button>
-          </div>
-        `
-        : "";
+      const summaryHtml = showSummary ? getSummaryHtml() : "";
 
       const backHtml = backTo
         ? `<button class="btn backBtn focusable" type="button" data-link="${esc(backTo)}" aria-label="返回">← 返回</button>`
@@ -1154,15 +1193,7 @@
         return;
       }
       setNavCurrent("progress");
-      renderTop({
-        title: `进展｜${st.label}`,
-        subtitle: "可点学校进入介绍",
-        showSummary: true,
-        backTo: "#progress",
-        showUpdatedAt: true,
-        inlineUpdatedAt: true,
-        inlineSubtitle: true,
-      });
+      renderProgressStatusTop();
 
       const from = location.hash.replace(/^#/, "") || `progress/status/${statusKey}`;
       const app = document.getElementById("app");
